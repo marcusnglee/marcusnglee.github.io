@@ -7,7 +7,7 @@ var typewriter = new Typewriter(app, {
 
 typewriter
   .pauseFor(1000)
-  .typeString("Student, Engineer, Music Producer.") //Add your own tagline
+  .typeString("Student, Engineer, Music Producer, Tea Enthusiast.") //Add your own tagline
   .pauseFor(3000)
   .start();
 
@@ -16,7 +16,7 @@ var granimInstance = new Granim({
   direction: "top-bottom",
   isPausedWhenNotInView: true,
   image: {
-    source: "assets/new_york_skyline.jpeg", //change image for intro section if desired
+    source: "assets/tea_farm.jpg", //change image for intro section if desired
     blendingMode: "multiply",
   },
   states: {
