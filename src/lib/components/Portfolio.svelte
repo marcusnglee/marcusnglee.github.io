@@ -8,7 +8,7 @@
         link: string
     }
     type CATEGORY = "Professional Experience" | "Project"
-    </script>
+</script>
     
     <div class="container">
         {#each works as work}
