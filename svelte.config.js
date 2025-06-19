@@ -10,8 +10,7 @@ const config = {
   kit: {
     adapter: adapter(),
     paths: {
-      base:
-        process.env.NODE_ENV === "production" ? "/marcusnglee.github.io" : "",
+      base: "",
     },
   },
 };
