@@ -1,19 +1,22 @@
 import type { Work } from "$lib/components/Portfolio.svelte";
 import type { PageLoad } from "./$types";
+import { base } from "$app/paths";
+
+export const prerender = true;
 
 // --------WORKS------------
 const works: Work[] = [
   {
     category: "Professional Experience",
     title: "Software Engineer @ Arrowstreet Capital",
-    img: "/arrowstreet_logo.png",
+    img: `${base}/arrowstreet_logo.png`,
     description: "Research Systems: Compute Platform",
     link: "https://www.arrowstreetcapital.com/",
   },
   {
     category: "Professional Experience",
     title: "Software Engineer @ Gojo Labs",
-    img: "/doubleup_logo.jpg",
+    img: `${base}/doubleup_logo.jpg`,
     description:
       "Frontend and Smart Contract develoepr for DoubleUp Citizens product launch",
     link: "https://www.doubleup.fun/",
@@ -21,14 +24,14 @@ const works: Work[] = [
   {
     category: "Professional Experience",
     title: "Cloud Engineer @ Agilysys",
-    img: "/agilysys_logo.png",
+    img: `${base}/agilysys_logo.png`,
     description: "Automated deployment and DR for kubernetes clusters",
     link: "https://www.agilysys.com/",
   },
   {
     category: "Project",
     title: "Flowr",
-    img: "/flowr.png",
+    img: `${base}/flowr.png`,
     description:
       "decentralized music platform for transparent data, payments, and ownership",
     link: "https://github.com/flowrpowr",
@@ -36,7 +39,7 @@ const works: Work[] = [
   {
     category: "Professional Experience",
     title: "Audio Engineer @ Vibe Studios Vegas",
-    img: "/vibes_studio.jpg",
+    img: `${base}/vibes_studio.jpg`,
     description: "recording and mixing",
     link: "https://vibestudiosvegas.com/",
   },
