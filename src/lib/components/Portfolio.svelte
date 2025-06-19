@@ -1,16 +1,19 @@
 <script lang='ts'>
-let {projects}: {projects: Project[]} = $props();
-export type Project = {
+let {works}: {works: Work[]} = $props();
+export type Work = {
+    category: CATEGORY,
     title: string;
     img: string,
-
+    description: string,
+    link: string
 }
+type CATEGORY = "Professional Experience" | "Project"
 </script>
 
 <div class="container">
-    {#each projects as project}
+    {#each works as work}
     <div class='project'>
-        <img src={project.img} alt={project.title}>
+        <img src={work.img} alt={work.title}>
     </div>
     {/each}
 </div>
