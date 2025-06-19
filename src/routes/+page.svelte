@@ -12,7 +12,7 @@
 
 <style>
   :global(body) {
-    background-color: rgb(218, 218, 218);
+    background-color: rgb(248, 248, 248);
   }
   .frame {
     padding: 4rem;
