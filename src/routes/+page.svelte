@@ -15,7 +15,7 @@
     background-color: rgb(248, 248, 248);
   }
   .frame {
-    padding: 4rem;
+    padding: 4rem 16rem;
   }
   
 </style>
