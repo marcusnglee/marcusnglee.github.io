@@ -10,8 +10,8 @@
         he contemplates over his lightly-brewed cup of tea.
     </p>
     <div class='links'>
-        <a href="https://www.linkedin.com/in/marcusnglee">linkedin.com/in/marcusnglee</a>
-        <a href="https://www.github.com/marcusnglee">github.com/marcusnglee</a>
+        <a target="_blank" rel="noopener noref" href="https://www.linkedin.com/in/marcusnglee">linkedin.com/in/marcusnglee</a>
+        <a target="_blank" rel="noopener noref" href="https://www.github.com/marcusnglee">github.com/marcusnglee</a>
 
     </div>
 </div>
