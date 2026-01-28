@@ -1,0 +1,28 @@
+/* Anthropic-inspired warm & earthy color palette */
+:root {
+	/* Background colors */
+	--color-bg-primary: #faf8f5;
+	--color-bg-secondary: #f2efe9;
+	--color-bg-tertiary: #e8e4dc;
+
+	/* Text colors */
+	--color-text-primary: #2c2820;
+	--color-text-secondary: #5a5349;
+	--color-text-tertiary: #7a7169;
+
+	/* Accent colors */
+	--color-accent-crimson: #b8594f;
+	--color-accent-ochre: #c69c6d;
+	--color-accent-sage: #8a9a7e;
+
+	/* Functional colors */
+	--color-link: var(--color-accent-crimson);
+	--color-link-hover: #9a4742;
+	--color-border: #d4cfc5;
+	--color-border-light: #e8e4dc;
+
+	/* Semantic colors */
+	--color-success: var(--color-accent-sage);
+	--color-warning: var(--color-accent-ochre);
+	--color-error: var(--color-accent-crimson);
+}
