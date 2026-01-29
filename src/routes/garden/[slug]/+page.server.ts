@@ -6,17 +6,18 @@ export const load: PageServerLoad = ({ params }) => {
 	try {
 		const note = getNoteBySlug(params.slug);
 
-		if (!note || note.frontmatter.category !== 'essay') {
-			throw error(404, 'Essay not found');
+		if (!note) {
+			throw error(404, 'Entry not found');
 		}
 
-		// Get related notes by tags
+		// Get related notes (same category or shared tags)
 		const allNotes = getNotesMetadata();
 		const relatedNotes = allNotes
 			.filter(
 				(n) =>
 					n.slug !== note.slug &&
-					n.tags.some((tag) => note.frontmatter.tags.includes(tag))
+					(n.category === note.frontmatter.category ||
+						n.tags.some((tag) => note.frontmatter.tags.includes(tag)))
 			)
 			.slice(0, 3);
 
@@ -37,7 +38,7 @@ export const load: PageServerLoad = ({ params }) => {
 			relatedNotes
 		};
 	} catch (err) {
-		console.error('Error loading essay:', err);
-		throw error(404, 'Essay not found');
+		console.error('Error loading entry:', err);
+		throw error(404, 'Entry not found');
 	}
 };

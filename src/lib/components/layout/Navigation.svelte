@@ -1,17 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { browser } from '$app/environment';
+	import { GARDEN_CATEGORIES, type GardenCategory } from '$lib/types/garden';
 
 	let scrolled = $state(false);
 	let mobileMenuOpen = $state(false);
+	let gardenDropdownOpen = $state(false);
 
-	const navLinks = [
-		{ href: '/', label: 'Home' },
-		{ href: '/garden', label: 'Garden' },
-		{ href: '/garden/essays', label: 'Essays' },
-		{ href: '/garden/notes', label: 'Notes' },
-		{ href: '/garden/projects', label: 'Projects' }
-	];
+	const categories = Object.entries(GARDEN_CATEGORIES) as [GardenCategory, typeof GARDEN_CATEGORIES[GardenCategory]][];
 
 	$effect(() => {
 		if (!browser) return;
@@ -42,8 +38,16 @@
 
 <nav class="nav" class:scrolled>
 	<div class="nav-container">
-		<a href="/" class="nav-brand" onclick={closeMobileMenu}>
-			<span class="brand-name">Marcus Lee</span>
+		<a href="/" class="nav-brand" onclick={closeMobileMenu} aria-label="Home">
+			<svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+				<!-- Tea cup -->
+				<path d="M17 8h1a4 4 0 0 1 0 8h-1" />
+				<path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z" />
+				<!-- Steam -->
+				<path d="M6 1v3" />
+				<path d="M10 1v3" />
+				<path d="M14 1v3" />
+			</svg>
 		</a>
 
 		<button
@@ -56,16 +60,53 @@
 		</button>
 
 		<div class="nav-links" class:mobile-open={mobileMenuOpen}>
-			{#each navLinks as link}
+			<a
+				href="/"
+				class="nav-link"
+				class:active={isActive('/')}
+				onclick={closeMobileMenu}
+			>
+				Home
+			</a>
+
+			<!-- Garden with dropdown -->
+			<div
+				class="nav-dropdown"
+				onmouseenter={() => gardenDropdownOpen = true}
+				onmouseleave={() => gardenDropdownOpen = false}
+			>
 				<a
-					href={link.href}
-					class="nav-link"
-					class:active={isActive(link.href)}
+					href="/garden"
+					class="nav-link has-dropdown"
+					class:active={isActive('/garden')}
 					onclick={closeMobileMenu}
 				>
-					{link.label}
+					Garden
+					<span class="dropdown-arrow">▾</span>
 				</a>
-			{/each}
+
+				{#if gardenDropdownOpen}
+					<div class="dropdown-menu">
+						<div class="dropdown-grid">
+							{#each categories as [key, info]}
+								<a
+									href="/garden?category={key}"
+									class="dropdown-item"
+									onclick={closeMobileMenu}
+								>
+									<span class="item-label">{info.label}</span>
+									<span class="item-description">{info.description}</span>
+								</a>
+							{/each}
+						</div>
+						<div class="dropdown-footer">
+							<a href="/garden" class="view-all" onclick={closeMobileMenu}>
+								View all entries →
+							</a>
+						</div>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 </nav>
@@ -110,20 +151,20 @@
 	}
 
 	.nav-brand {
-		font-family: var(--font-serif);
-		font-size: var(--text-xl);
-		font-weight: var(--font-semibold);
-		color: var(--color-text-primary);
 		text-decoration: none;
-		transition: var(--transition-colors);
-	}
-
-	.nav-brand:hover {
+		transition: var(--transition-all);
 		color: var(--color-accent-crimson);
 	}
 
-	.brand-name {
-		display: inline-block;
+	.nav-brand:hover {
+		transform: scale(1.1);
+		color: var(--color-text-primary);
+	}
+
+	.brand-icon {
+		width: 28px;
+		height: 28px;
+		display: block;
 	}
 
 	.mobile-menu-button {
@@ -207,6 +248,7 @@
 		.nav-links {
 			display: flex;
 			flex-direction: row;
+			align-items: center;
 			position: static;
 			background-color: transparent;
 			border-bottom: none;
@@ -246,6 +288,116 @@
 
 	@media (max-width: 767px) {
 		.nav-link.active::after {
+			display: none;
+		}
+	}
+
+	/* Dropdown styles */
+	.nav-dropdown {
+		position: relative;
+		padding-bottom: var(--space-4);
+		margin-bottom: calc(-1 * var(--space-4));
+	}
+
+	.has-dropdown {
+		display: flex;
+		align-items: center;
+		gap: var(--space-1);
+	}
+
+	.dropdown-arrow {
+		font-size: 1.1em;
+		opacity: 0.7;
+	}
+
+	.dropdown-menu {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		width: 480px;
+		max-width: calc(100vw - 2rem);
+		background-color: var(--color-bg-primary);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-xl);
+		padding: var(--space-4);
+		z-index: 100;
+	}
+
+	/* Invisible bridge to connect trigger to dropdown */
+	.nav-dropdown::after {
+		content: '';
+		position: absolute;
+		top: 100%;
+		right: 0;
+		width: 100%;
+		height: 16px;
+		background: transparent;
+		display: none;
+	}
+
+	.nav-dropdown:hover::after {
+		display: block;
+	}
+
+	.dropdown-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: var(--space-2);
+	}
+
+	.dropdown-item {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: var(--space-3);
+		border-radius: var(--radius-md);
+		text-decoration: none;
+		transition: var(--transition-colors);
+	}
+
+	.dropdown-item:hover {
+		background-color: var(--color-bg-secondary);
+	}
+
+	.item-label {
+		font-size: var(--text-sm);
+		font-weight: var(--font-medium);
+		color: var(--color-text-primary);
+	}
+
+	.item-description {
+		font-size: var(--text-xs);
+		color: var(--color-text-tertiary);
+		line-height: var(--leading-relaxed);
+	}
+
+	.dropdown-footer {
+		margin-top: var(--space-3);
+		padding-top: var(--space-3);
+		border-top: 1px solid var(--color-border-light);
+		text-align: center;
+	}
+
+	.view-all {
+		font-size: var(--text-sm);
+		font-weight: var(--font-medium);
+		color: var(--color-link);
+		text-decoration: none;
+		transition: var(--transition-colors);
+	}
+
+	.view-all:hover {
+		color: var(--color-link-hover);
+	}
+
+	/* Hide dropdown on mobile - show as regular links */
+	@media (max-width: 767px) {
+		.dropdown-menu {
+			display: none;
+		}
+
+		.dropdown-arrow {
 			display: none;
 		}
 	}

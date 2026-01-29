@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Container from '$lib/components/layout/Container.svelte';
 	import Tag from '$lib/components/ui/Tag.svelte';
-	import BackLinks from '$lib/components/garden/BackLinks.svelte';
-	import NoteCard from '$lib/components/garden/NoteCard.svelte';
+	import { GARDEN_CATEGORIES } from '$lib/types/garden';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -15,6 +14,8 @@
 			day: 'numeric'
 		});
 	}
+
+	const categoryInfo = GARDEN_CATEGORIES[data.note.category];
 </script>
 
 <svelte:head>
@@ -30,13 +31,17 @@
 		<nav class="breadcrumb">
 			<a href="/garden" class="breadcrumb-link">Garden</a>
 			<span class="breadcrumb-separator">/</span>
-			<a href="/garden/essays" class="breadcrumb-link">Essays</a>
-			<span class="breadcrumb-separator">/</span>
-			<span class="breadcrumb-current">{data.note.title}</span>
+			<span class="breadcrumb-current">{categoryInfo?.label || data.note.category}</span>
 		</nav>
 
 		<!-- Header -->
 		<header class="note-header">
+			<Tag
+				label={categoryInfo?.label || data.note.category}
+				color={categoryInfo?.color || 'default'}
+				size="md"
+			/>
+
 			<h1 class="note-title">{data.note.title}</h1>
 
 			{#if data.note.description}
@@ -51,7 +56,7 @@
 				<span class="meta-reading-time">{data.note.readingTime} min read</span>
 				{#if data.note.updated}
 					<span class="meta-separator">•</span>
-					<span class="meta-updated" title="Last updated {formatDate(data.note.updated)}">
+					<span class="meta-updated">
 						Updated {formatDate(data.note.updated)}
 					</span>
 				{/if}
@@ -60,7 +65,7 @@
 			{#if data.note.tags.length > 0}
 				<div class="note-tags">
 					{#each data.note.tags as tag}
-						<Tag label={tag} href="/tags/{tag}" size="sm" />
+						<span class="tag-label">{tag}</span>
 					{/each}
 				</div>
 			{/if}
@@ -70,19 +75,21 @@
 		<div class="prose">
 			{@html data.note.content}
 		</div>
-
-		<!-- Backlinks -->
-		<BackLinks backlinks={data.note.backlinks} category={data.note.category} />
 	</Container>
 
 	<!-- Related Notes -->
 	{#if data.relatedNotes.length > 0}
 		<section class="related-section">
-			<Container size="lg">
-				<h2 class="related-title">Related Notes</h2>
-				<div class="related-grid">
-					{#each data.relatedNotes as relatedNote}
-						<NoteCard note={relatedNote} />
+			<Container size="md">
+				<h2 class="related-title">Related</h2>
+				<div class="related-list">
+					{#each data.relatedNotes as related}
+						<a href="/garden/{related.slug}" class="related-link">
+							<span class="related-category">
+								{GARDEN_CATEGORIES[related.category]?.label || related.category}
+							</span>
+							<span class="related-name">{related.title}</span>
+						</a>
 					{/each}
 				</div>
 			</Container>
@@ -96,17 +103,15 @@
 	}
 
 	.note-header {
-		margin-bottom: var(--space-12);
-		text-align: center;
+		margin-bottom: var(--space-10);
 	}
 
 	.note-title {
 		font-family: var(--font-serif);
-		font-size: var(--text-4xl);
+		font-size: var(--text-3xl);
 		font-weight: var(--font-semibold);
 		color: var(--color-text-primary);
-		margin-bottom: var(--space-4);
-		letter-spacing: var(--tracking-tight);
+		margin: var(--space-4) 0 var(--space-3);
 		line-height: var(--leading-tight);
 	}
 
@@ -115,15 +120,11 @@
 		color: var(--color-text-secondary);
 		line-height: var(--leading-relaxed);
 		margin-bottom: var(--space-4);
-		max-width: 42rem;
-		margin-left: auto;
-		margin-right: auto;
 	}
 
 	.note-meta {
 		display: flex;
 		align-items: center;
-		justify-content: center;
 		gap: var(--space-2);
 		font-size: var(--text-sm);
 		color: var(--color-text-tertiary);
@@ -147,7 +148,14 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space-2);
-		justify-content: center;
+	}
+
+	.tag-label {
+		font-size: var(--text-xs);
+		color: var(--color-text-tertiary);
+		background-color: var(--color-bg-secondary);
+		padding: 0.25rem 0.75rem;
+		border-radius: var(--radius-full);
 	}
 
 	.prose {
@@ -155,31 +163,54 @@
 	}
 
 	.related-section {
-		margin-top: var(--space-20);
-		padding-top: var(--space-12);
+		margin-top: var(--space-12);
+		padding: var(--space-10) 0;
 		border-top: 1px solid var(--color-border);
 		background-color: var(--color-bg-secondary);
-		padding-bottom: var(--space-12);
 	}
 
 	.related-title {
 		font-family: var(--font-serif);
-		font-size: var(--text-2xl);
+		font-size: var(--text-lg);
 		font-weight: var(--font-semibold);
 		color: var(--color-text-primary);
-		text-align: center;
-		margin-bottom: var(--space-8);
+		margin-bottom: var(--space-4);
 	}
 
-	.related-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: var(--space-6);
+	.related-list {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
 	}
 
-	@media (min-width: 768px) {
-		.related-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
+	.related-link {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3);
+		background-color: var(--color-bg-primary);
+		border: 1px solid var(--color-border-light);
+		border-radius: var(--radius-md);
+		text-decoration: none;
+		transition: var(--transition-all);
+	}
+
+	.related-link:hover {
+		border-color: var(--color-border);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.related-category {
+		font-size: var(--text-xs);
+		font-weight: var(--font-semibold);
+		text-transform: uppercase;
+		letter-spacing: var(--tracking-wide);
+		color: var(--color-accent-crimson);
+		min-width: 80px;
+	}
+
+	.related-name {
+		font-size: var(--text-base);
+		color: var(--color-text-primary);
 	}
 </style>

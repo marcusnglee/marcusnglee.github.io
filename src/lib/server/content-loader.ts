@@ -180,7 +180,7 @@ export function getNoteBySlug(slug: string): ProcessedNote | null {
 /**
  * Gets notes by category
  */
-export function getNotesByCategory(category: 'essay' | 'note' | 'project'): ProcessedNote[] {
+export function getNotesByCategory(category: string): ProcessedNote[] {
 	const notes = loadAllNotes();
 	return notes.filter((note) => note.frontmatter.category === category);
 }

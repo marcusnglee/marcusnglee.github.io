@@ -6,64 +6,39 @@ const portfolioItems: PortfolioItem[] = [
 		id: 'arrowstreet',
 		category: 'experience',
 		title: 'Arrowstreet Capital',
-		subtitle: 'Software Engineer',
+		subtitle: 'Software Engineer Intern',
 		description:
-			'Research Systems: Compute Platform - Building scalable infrastructure for quantitative research',
+			'Built compute infrastructure for quantitative research.',
 		image: '/arrowstreet_logo.jpg',
 		link: 'https://www.arrowstreetcapital.com/',
-		tags: ['Infrastructure', 'Research Systems', 'Cloud'],
+		tags: ['Quant Finance', 'HPC', 'Distributed Systems'],
 		featured: true,
-		year: '2024'
+		year: 'Summer 2025'
 	},
 	{
 		id: 'gojo-labs',
 		category: 'experience',
 		title: 'Gojo Labs',
-		subtitle: 'Software Engineer',
+		subtitle: 'Software Engineer Intern',
 		description:
-			'Frontend and Smart Contract developer for DoubleUp Citizens product launch - Web3 gaming platform',
+			'Developed frontend interfaces and smart contracts for the DoubleUp Citizens product launch.',
 		image: '/doubleup_logo.jpg',
 		link: 'https://www.doubleup.fun/',
-		tags: ['Web3', 'Frontend', 'Smart Contracts', 'Gaming'],
+		tags: ['Web3', 'Frontend', 'Smart Contracts'],
 		featured: true,
-		year: '2023'
-	},
-	{
-		id: 'flowr',
-		category: 'project',
-		title: 'Flowr',
-		subtitle: 'Personal Project',
-		description:
-			'Decentralized music platform for transparent data, payments, and ownership - Empowering artists with blockchain technology',
-		image: '/flowr.png',
-		link: 'https://github.com/flowrpowr',
-		tags: ['Web3', 'Music', 'Blockchain', 'Open Source'],
-		featured: true,
-		year: '2023'
+		year: 'Summer 2024'
 	},
 	{
 		id: 'agilysys',
 		category: 'experience',
 		title: 'Agilysys',
-		subtitle: 'Cloud Engineer',
+		subtitle: 'Cloud Engineer Intern',
 		description:
-			'Automated deployment and disaster recovery for kubernetes clusters - Building resilient cloud infrastructure',
+			'Automated deployment and disaster recovery pipelines for Kubernetes clusters.',
 		image: '/agilysys_logo.jpg',
 		link: 'https://www.agilysys.com/',
-		tags: ['Kubernetes', 'DevOps', 'Cloud', 'Automation'],
-		year: '2022'
-	},
-	{
-		id: 'vibe-studios',
-		category: 'creative',
-		title: 'Vibe Studios Vegas',
-		subtitle: 'Audio Engineer',
-		description:
-			'Professional recording and mixing for artists - Bringing creative visions to life through sound',
-		image: '/vibes_studio.jpg',
-		link: 'https://vibestudiosvegas.com/',
-		tags: ['Audio', 'Music Production', 'Recording', 'Mixing'],
-		year: '2021'
+		tags: ['Infrastructure as Code', 'DevOps', 'Kubernetes'],
+		year: 'Summer 2023'
 	}
 ];
 

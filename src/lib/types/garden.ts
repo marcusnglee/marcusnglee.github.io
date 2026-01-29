@@ -1,7 +1,43 @@
+export type GardenCategory = 'seed' | 'essay' | 'playlist' | 'library' | 'tea';
+
+export interface CategoryInfo {
+	label: string;
+	description: string;
+	color: 'crimson' | 'ochre' | 'sage' | 'default';
+}
+
+export const GARDEN_CATEGORIES: Record<GardenCategory, CategoryInfo> = {
+	seed: {
+		label: 'Seeds',
+		description: 'Early ideas and rough thoughts, still germinating',
+		color: 'sage'
+	},
+	essay: {
+		label: 'Essays',
+		description: 'Long-form writing on topics I care about',
+		color: 'crimson'
+	},
+	playlist: {
+		label: 'Playlists',
+		description: 'Curated collections of music and sounds',
+		color: 'ochre'
+	},
+	library: {
+		label: 'Library',
+		description: 'Books, articles, and resources worth revisiting',
+		color: 'default'
+	},
+	tea: {
+		label: 'Tea Notes',
+		description: 'Tasting notes from my tea explorations',
+		color: 'sage'
+	}
+};
+
 export interface NoteFrontmatter {
 	title: string;
 	published: boolean;
-	category: 'essay' | 'note' | 'project';
+	category: GardenCategory;
 	tags: string[];
 	created: string;
 	updated?: string;
@@ -28,7 +64,7 @@ export interface ProcessedNote {
 export interface NoteMetadata {
 	slug: string;
 	title: string;
-	category: 'essay' | 'note' | 'project';
+	category: GardenCategory;
 	tags: string[];
 	created: string;
 	updated?: string;

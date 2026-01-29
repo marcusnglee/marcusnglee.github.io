@@ -8,17 +8,17 @@
 
 	let { note }: Props = $props();
 
-	const categoryLabels = {
-		essay: 'Essay',
-		note: 'Note',
-		project: 'Project'
+	const categoryLabels: Record<string, string> = {
+		project: 'Project',
+		tea: 'Tea'
 	};
 
-	const categoryPaths = {
-		essay: 'essays',
-		note: 'notes',
-		project: 'projects'
-	};
+	function getHref(note: NoteMetadata): string {
+		if (note.category === 'tea') {
+			return `/tea/${note.slug}`;
+		}
+		return `/garden/${note.slug}`;
+	}
 
 	function formatDate(dateString: string): string {
 		const date = new Date(dateString);
@@ -31,12 +31,12 @@
 </script>
 
 <article class="note-card">
-	<a href="/garden/{categoryPaths[note.category]}/{note.slug}" class="card-link">
+	<a href={getHref(note)} class="card-link">
 		<span class="sr-only">Read {note.title}</span>
 	</a>
 
 	<div class="card-header">
-		<span class="category-badge">{categoryLabels[note.category]}</span>
+		<span class="category-badge">{categoryLabels[note.category] || note.category}</span>
 		<span class="reading-time">{note.readingTime} min read</span>
 	</div>
 
