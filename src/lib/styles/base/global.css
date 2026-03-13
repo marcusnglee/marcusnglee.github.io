@@ -1,17 +1,17 @@
 /* Global Styles */
 body {
-	background-color: var(--color-bg-primary);
+	background-color: #4a6741;
 	overflow-x: hidden;
 }
 
 ::selection {
-	background-color: var(--color-accent-crimson);
-	color: var(--color-bg-primary);
+	background-color: #d45c2b;
+	color: #f5f0e8;
 }
 
 /* Focus styles for accessibility */
 :focus-visible {
-	outline: 2px solid var(--color-accent-crimson);
+	outline: 2px solid #d45c2b;
 	outline-offset: 2px;
 }
 

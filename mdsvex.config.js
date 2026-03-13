@@ -16,9 +16,5 @@ export default defineConfig({
 			}
 		]
 	],
-	layout: {
-		essay: './src/lib/layouts/EssayLayout.svelte',
-		note: './src/lib/layouts/NoteLayout.svelte',
-		project: './src/lib/layouts/ProjectLayout.svelte'
-	}
+	layout: {}
 });

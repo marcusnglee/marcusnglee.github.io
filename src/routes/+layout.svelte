@@ -1,17 +1,11 @@
 <script lang="ts">
 	import '../app.css';
-	import Navigation from '$lib/components/layout/Navigation.svelte';
-	import Footer from '$lib/components/layout/Footer.svelte';
 </script>
 
 <div class="app">
-	<Navigation />
-
 	<main class="main">
 		<slot />
 	</main>
-
-	<Footer />
 </div>
 
 <style>

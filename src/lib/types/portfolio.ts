@@ -1,6 +1,6 @@
 export interface PortfolioItem {
 	id: string;
-	category: 'experience' | 'project' | 'creative';
+	category: 'experience' | 'project' | 'creative' | 'education';
 	title: string;
 	subtitle?: string;
 	description: string;

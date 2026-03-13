@@ -130,20 +130,20 @@
 	.page-header {
 		text-align: center;
 		max-width: var(--container-md);
-		margin: var(--space-12) auto var(--space-8);
+		margin: var(--space-16) auto var(--space-8);
 	}
 
 	.title {
 		font-family: var(--font-serif);
 		font-size: var(--text-3xl);
 		font-weight: var(--font-semibold);
-		color: var(--color-text-primary);
+		color: #f5f0e8;
 		margin-bottom: var(--space-3);
 	}
 
 	.description {
 		font-size: var(--text-lg);
-		color: var(--color-text-secondary);
+		color: rgba(245, 240, 232, 0.75);
 		line-height: var(--leading-relaxed);
 	}
 
@@ -191,7 +191,7 @@
 
 	.results-count {
 		font-size: var(--text-sm);
-		color: var(--color-text-tertiary);
+		color: rgba(245, 240, 232, 0.6);
 	}
 
 	.notes-list {
