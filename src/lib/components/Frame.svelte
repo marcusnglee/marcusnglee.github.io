@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { locked, navigateFn } from '$lib/stores/canvas';
 
 	let {
 		id,
@@ -29,6 +30,11 @@
 
 <div {id} class="frame" style="left: {x}px; top: {y}px; {width ? `width: ${width}px;` : ''}">
 	{@render children()}
+	{#if $locked && id !== 'about'}
+		<div class="home-bar">
+			<button class="home-btn" onclick={() => $navigateFn?.('about')}>← Home</button>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -51,5 +57,27 @@
 		text-transform: uppercase;
 		pointer-events: none;
 		user-select: none;
+	}
+
+	.home-bar {
+		border-top: 1px solid #f0ece4;
+		padding: 0.75rem 2rem;
+	}
+
+	.home-btn {
+		background: none;
+		border: none;
+		padding: 0;
+		font-family: Montserrat, sans-serif;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #aaa;
+		cursor: pointer;
+		transition: color 0.15s ease;
+		letter-spacing: 0.01em;
+	}
+
+	.home-btn:hover {
+		color: #1a1a1a;
 	}
 </style>

@@ -12,7 +12,7 @@
   const framePositions = {
     about:     { x: -300, y: -200, width: 600, height: 400 },
     portfolio: { x: 1100, y: -250, width: 740, height: 650 },
-    garden:    { x: -300, y: -1400, width: 600, height: 400 },
+    garden:    { x: -300, y:  350,  width: 600, height: 400 },
     links:     { x: -1700, y: -200, width: 480, height: 380 },
   };
 </script>

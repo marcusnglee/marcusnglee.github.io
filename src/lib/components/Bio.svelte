@@ -18,6 +18,7 @@
     <a target="_blank" rel="noopener noreferrer" href="https://www.linkedin.com/in/marcusnglee">LinkedIn</a>
     <a target="_blank" rel="noopener noreferrer" href="https://www.github.com/marcusnglee">GitHub</a>
   </div>
+  <p class="hint">feel free to browse around!</p>
 </div>
 
 <style>
@@ -96,5 +97,12 @@
   .social a:hover {
     color: #1a1a1a;
     border-color: #1a1a1a;
+  }
+
+  .hint {
+    font-size: 0.75rem;
+    color: #bbb;
+    margin: 1rem 0 0;
+    font-style: italic;
   }
 </style>

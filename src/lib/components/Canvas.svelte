@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { navigateFn } from '$lib/stores/canvas';
+	import { navigateFn, locked } from '$lib/stores/canvas';
 	import type { Snippet } from 'svelte';
 
 	interface FramePos {
@@ -26,7 +26,6 @@
 
 	let viewportEl: HTMLDivElement;
 
-	const GRID_SIZE = 24;
 	const MIN_SCALE = 0.2;
 	const MAX_SCALE = 3;
 
@@ -36,18 +35,8 @@
 	let lastTouchMidX = 0;
 	let lastTouchMidY = 0;
 
-	// Update dot grid CSS custom properties whenever transform changes
-	$effect(() => {
-		if (!viewportEl) return;
-		const gs = GRID_SIZE * scale;
-		const ox = ((tx % gs) + gs) % gs;
-		const oy = ((ty % gs) + gs) % gs;
-		viewportEl.style.setProperty('--dot-ox', `${ox}px`);
-		viewportEl.style.setProperty('--dot-oy', `${oy}px`);
-		viewportEl.style.setProperty('--dot-size', `${gs}px`);
-	});
-
 	function startDrag(e: MouseEvent) {
+		if ($locked) return;
 		if (e.button !== 0) return;
 		const target = e.target as HTMLElement;
 		if (target.closest('button, a, input, textarea, select')) return;
@@ -70,6 +59,7 @@
 
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
+		if ($locked) return;
 		if (e.ctrlKey || e.metaKey) {
 			// Pinch-to-zoom (trackpad) or ctrl+scroll
 			const delta = -e.deltaY * 0.005;
@@ -87,6 +77,7 @@
 	}
 
 	function handleTouchStart(e: TouchEvent) {
+		if ($locked) return;
 		if (e.touches.length === 2) {
 			const t1 = e.touches[0];
 			const t2 = e.touches[1];
@@ -105,6 +96,7 @@
 
 	function handleTouchMove(e: TouchEvent) {
 		e.preventDefault();
+		if ($locked) return;
 		if (e.touches.length === 2) {
 			isDragging = false;
 			const t1 = e.touches[0];
@@ -141,6 +133,7 @@
 		isAnimating = true;
 		tx = vw / 2 - (frame.x + frame.width / 2) * scale;
 		ty = vh / 2 - (frame.y + frame.height / 2) * scale;
+		locked.set(id !== 'about');
 		setTimeout(() => {
 			isAnimating = false;
 		}, 560);
@@ -171,6 +164,7 @@
 
 		return () => {
 			navigateFn.set(null);
+			locked.set(false);
 			window.removeEventListener('mousemove', onGlobalMouseMove);
 			window.removeEventListener('mouseup', onGlobalMouseUp);
 			viewportEl.removeEventListener('wheel', handleWheel);
@@ -185,7 +179,7 @@
 <div
 	bind:this={viewportEl}
 	class="viewport"
-	class:dragging={isDragging}
+	class:locked={$locked}
 	onmousedown={startDrag}
 	role="application"
 	aria-label="Infinite canvas"
@@ -206,17 +200,14 @@
 		inset: 0;
 		overflow: hidden;
 		background-color: #f8f6f1;
-		background-image: radial-gradient(circle, #c8c3b8 1.5px, transparent 1.5px);
-		background-size: var(--dot-size, 24px) var(--dot-size, 24px);
-		background-position: var(--dot-ox, 0px) var(--dot-oy, 0px);
 		user-select: none;
 		-webkit-user-select: none;
-		cursor: grab;
+		cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='4' fill='%231a1a1a'/%3E%3C/svg%3E") 5 5, auto;
 		outline: none;
 	}
 
-	.viewport.dragging {
-		cursor: grabbing;
+	.viewport.locked {
+		cursor: default;
 	}
 
 	.canvas-inner {
