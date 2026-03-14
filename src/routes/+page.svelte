@@ -94,13 +94,12 @@
     justify-content: center;
     background: #f8f6f1;
     opacity: 1;
-    pointer-events: auto;
+    pointer-events: none; /* pass drags through to canvas */
     transition: opacity 0.35s ease;
   }
 
   .about-overlay.hiding {
     opacity: 0;
-    pointer-events: none;
   }
 
   /* ── Section overlays ── */

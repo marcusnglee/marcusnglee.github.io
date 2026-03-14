@@ -43,6 +43,7 @@
   .bio {
     font-family: Montserrat, sans-serif;
     width: min(580px, calc(100vw - 5rem));
+    pointer-events: auto;
   }
 
   .bio-top {
