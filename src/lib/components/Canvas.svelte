@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { navigateFn, locked } from '$lib/stores/canvas';
+	import { navigateFn, locked, activeSection } from '$lib/stores/canvas';
 	import type { Snippet } from 'svelte';
 
 	interface FramePos {
@@ -134,6 +134,7 @@
 		tx = vw / 2 - (frame.x + frame.width / 2) * scale;
 		ty = vh / 2 - (frame.y + frame.height / 2) * scale;
 		locked.set(id !== 'about');
+		activeSection.set(id === 'about' ? null : id);
 		setTimeout(() => {
 			isAnimating = false;
 		}, 560);
@@ -165,6 +166,7 @@
 		return () => {
 			navigateFn.set(null);
 			locked.set(false);
+			activeSection.set(null);
 			window.removeEventListener('mousemove', onGlobalMouseMove);
 			window.removeEventListener('mouseup', onGlobalMouseUp);
 			viewportEl.removeEventListener('wheel', handleWheel);
@@ -202,12 +204,7 @@
 		background-color: #f8f6f1;
 		user-select: none;
 		-webkit-user-select: none;
-		cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='4' fill='%231a1a1a'/%3E%3C/svg%3E") 5 5, auto;
 		outline: none;
-	}
-
-	.viewport.locked {
-		cursor: default;
 	}
 
 	.canvas-inner {
