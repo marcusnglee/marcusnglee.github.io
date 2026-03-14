@@ -2,10 +2,10 @@
 	import { navigateFn } from '$lib/stores/canvas';
 
 	const navItems = [
-		{ label: 'About', id: 'about' },
-		{ label: 'Work', id: 'portfolio' },
-		{ label: 'Garden', id: 'garden' },
-		{ label: 'Links', id: 'links' }
+		{ id: 'about',     shape: 'circle'   },
+		{ id: 'portfolio', shape: 'square'   },
+		{ id: 'garden',    shape: 'triangle' },
+		{ id: 'links',     shape: 'diamond'  },
 	];
 
 	function navigate(id: string) {
@@ -17,7 +17,17 @@
 	<div class="name">marcus lee</div>
 	<nav>
 		{#each navItems as item}
-			<button onclick={() => navigate(item.id)}>{item.label}</button>
+			<button onclick={() => navigate(item.id)} aria-label={item.id}>
+				{#if item.shape === 'circle'}
+					<svg viewBox="0 0 14 14" fill="currentColor"><circle cx="7" cy="7" r="6"/></svg>
+				{:else if item.shape === 'square'}
+					<svg viewBox="0 0 14 14" fill="currentColor"><rect x="1" y="1" width="12" height="12"/></svg>
+				{:else if item.shape === 'triangle'}
+					<svg viewBox="0 0 14 14" fill="currentColor"><polygon points="7,1 13,13 1,13"/></svg>
+				{:else if item.shape === 'diamond'}
+					<svg viewBox="0 0 14 14" fill="currentColor"><polygon points="7,1 13,7 7,13 1,7"/></svg>
+				{/if}
+			</button>
 		{/each}
 	</nav>
 </header>
@@ -49,24 +59,33 @@
 	}
 
 	nav {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
 		display: flex;
-		gap: 24px;
+		gap: 20px;
 		align-items: center;
 	}
 
 	nav button {
-		font-family: Montserrat, sans-serif;
-		font-size: 12px;
-		color: #777;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 20px;
+		height: 20px;
 		background: none;
 		border: none;
-		cursor: pointer;
-		padding: 4px 0;
+		padding: 0;
+		color: #bbb;
 		transition: color 0.15s ease;
-		letter-spacing: 0.02em;
 	}
 
 	nav button:hover {
 		color: #1a1a1a;
+	}
+
+	nav button svg {
+		width: 10px;
+		height: 10px;
 	}
 </style>

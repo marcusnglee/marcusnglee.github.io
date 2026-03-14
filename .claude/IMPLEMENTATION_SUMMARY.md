@@ -1,5 +1,60 @@
 # Digital Garden Implementation Summary
 
+---
+
+## 🟢 Current State (as of March 2026)
+
+The project has been **fully redesigned** from the phases below into an **infinite canvas portfolio**. The canvas-based design is live on `main`. The below phases (1–8) describe historical work on a `redesign` branch that was superseded.
+
+### Architecture Overview
+
+**Stack:** SvelteKit + Svelte 5, TypeScript, deployed to GitHub Pages
+**Entry point:** `src/routes/+page.svelte`
+**Key stores:** `src/lib/stores/canvas.ts` — `navigateFn`, `locked`, `activeSection`
+
+#### How navigation works
+- `Canvas.svelte` renders an infinite panning canvas (no manual zoom — zoom is purely programmatic).
+- On load, canvas centers on the `about` frame position.
+- Clicking a section preview card calls `navigateFn(id)`, which:
+  1. Animates `scale` to `min(vw/frameW, vh/frameH)` to zoom-fill the viewport (500ms cubic-bezier transition).
+  2. Sets `activeSection` → triggers a full-screen fixed overlay for that section.
+  3. Sets `locked = true` (disables canvas drag).
+- Clicking **← Home** calls `navigateFn('about')`, which resets scale to 1 and clears `activeSection`/`locked`.
+
+#### Overlay architecture (critical)
+`position: fixed` inside a CSS-transformed element does **not** anchor to the viewport (the transform creates a new containing block). All overlays are therefore rendered **outside** `Canvas.svelte` directly in `+page.svelte`:
+
+- **About overlay** — always mounted, fades out when `$locked`. `pointer-events: none` on the container so the canvas is pannable through the bio; `pointer-events: auto` on `.bio` so buttons/links work.
+- **Section overlays** — one `{#if}` block per section (portfolio/garden/links), each with `transition:fade`. Full-screen, `overflow-x: auto; overflow-y: hidden`, `scroll-snap-type: x mandatory`. A `use:hscroll` action converts vertical wheel events to horizontal scroll.
+
+#### Key components
+
+| File | Role |
+|------|------|
+| `src/routes/+page.svelte` | Root: all overlays + canvas with Frame preview cards |
+| `src/lib/components/Canvas.svelte` | Infinite pan canvas; programmatic zoom on navigate |
+| `src/lib/components/Frame.svelte` | Preview card in canvas space (no children/fixed props) |
+| `src/lib/components/Bio.svelte` | About content; `width: min(580px, calc(100vw - 5rem))` |
+| `src/lib/components/Portfolio.svelte` | Horizontal scroll panels (image 55% / info 45%) |
+| `src/lib/components/Header.svelte` | Fixed top bar with nav shape buttons |
+
+#### Canvas frame positions (defined in `+page.svelte`)
+```ts
+about:     { x: -300, y: -200, width: 600,  height: 400 }
+portfolio: { x: 1100, y: -250, width: 740,  height: 650 }
+garden:    { x: -300, y:  350, width: 600,  height: 400 }
+links:     { x: -1700,y: -200, width: 480,  height: 380 }
+```
+
+#### What's still TODO / known gaps
+- **Garden section** — currently shows "coming soon." Needs real content wired up.
+- **Links section** — hardcoded list of 3 links; should pull from data.
+- **Mobile UX** — not thoroughly tested; touch panning works but section overlays may need padding adjustments.
+- **Header nav** — shape buttons exist but their exact IDs/behavior should be verified match section IDs.
+- **Portfolio data** — comes from `+page.ts` loader (`data.works`); verify images and links are correct.
+
+---
+
 ## ✅ Completed Phases (1-8)
 
 ### Phase 1: Foundation & Setup
