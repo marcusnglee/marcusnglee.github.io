@@ -8,6 +8,9 @@
 		y,
 		width,
 		label,
+		fixed = false,
+		dark = false,
+		background,
 		children
 	}: {
 		id?: string;
@@ -15,38 +18,78 @@
 		y: number;
 		width?: number;
 		label?: string;
+		fixed?: boolean;
+		dark?: boolean;
+		background?: string;
 		children: Snippet;
 	} = $props();
 
 	let isRevealed = $derived(id === 'about' || $activeSection === id);
 </script>
 
-{#if label}
+{#if fixed}
+	<!-- Full-screen overlay for the about/landing frame -->
 	<div
-		class="frame-label"
-		style="left: {x}px; top: {y - 22}px; {width ? `width: ${width}px;` : ''}"
+		{id}
+		class="frame-fullscreen"
+		class:hiding={$locked}
+		style={background ? `background: ${background};` : ''}
 	>
-		{label}
+		{@render children()}
+	</div>
+{:else}
+	{#if label}
+		<div
+			class="frame-label"
+			style="left: {x}px; top: {y - 22}px; {width ? `width: ${width}px;` : ''}"
+		>
+			{label}
+		</div>
+	{/if}
+
+	<div
+		{id}
+		class="frame"
+		class:dark
+		style="left: {x}px; top: {y}px; {width ? `width: ${width}px;` : ''}{background ? ` background: ${background};` : ''}"
+	>
+		{#if isRevealed}
+			{@render children()}
+			{#if $locked && id !== 'about'}
+				<div class="home-bar">
+					<button class="home-btn" onclick={() => $navigateFn?.('about')}>← Home</button>
+				</div>
+			{/if}
+		{:else}
+			<button class="preview" onclick={() => $navigateFn?.(id ?? '')}>
+				<span class="preview-label">{label}</span>
+				<span class="preview-hint">enter →</span>
+			</button>
+		{/if}
 	</div>
 {/if}
 
-<div {id} class="frame" style="left: {x}px; top: {y}px; {width ? `width: ${width}px;` : ''}">
-	{#if isRevealed}
-		{@render children()}
-		{#if $locked && id !== 'about'}
-			<div class="home-bar">
-				<button class="home-btn" onclick={() => $navigateFn?.('about')}>← Home</button>
-			</div>
-		{/if}
-	{:else}
-		<button class="preview" onclick={() => $navigateFn?.(id ?? '')}>
-			<span class="preview-label">{label}</span>
-			<span class="preview-hint">enter →</span>
-		</button>
-	{/if}
-</div>
-
 <style>
+	/* ── Fixed full-screen frame (About / landing) ── */
+	.frame-fullscreen {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: #f8f6f1;
+		opacity: 1;
+		pointer-events: auto;
+		transition: opacity 0.35s ease;
+	}
+
+	.frame-fullscreen.hiding {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	/* ── Canvas card frame ── */
 	.frame {
 		position: absolute;
 		background: #fff;
@@ -55,6 +98,13 @@
 		box-shadow:
 			0 4px 24px rgba(0, 0, 0, 0.06),
 			0 1px 4px rgba(0, 0, 0, 0.04);
+	}
+
+	.frame.dark {
+		border-color: rgba(255, 255, 255, 0.08);
+		box-shadow:
+			0 4px 24px rgba(0, 0, 0, 0.3),
+			0 1px 4px rgba(0, 0, 0, 0.15);
 	}
 
 	.frame-label {
@@ -68,6 +118,7 @@
 		user-select: none;
 	}
 
+	/* ── Preview gateway button ── */
 	.preview {
 		display: flex;
 		flex-direction: column;
@@ -84,7 +135,11 @@
 	}
 
 	.preview:hover {
-		background: #faf8f4;
+		background: rgba(0, 0, 0, 0.03);
+	}
+
+	.dark .preview:hover {
+		background: rgba(255, 255, 255, 0.06);
 	}
 
 	.preview-label {
@@ -95,6 +150,10 @@
 		letter-spacing: -0.02em;
 	}
 
+	.dark .preview-label {
+		color: rgba(255, 255, 255, 0.88);
+	}
+
 	.preview-hint {
 		font-family: Montserrat, sans-serif;
 		font-size: 0.75rem;
@@ -103,13 +162,26 @@
 		transition: color 0.15s ease;
 	}
 
+	.dark .preview-hint {
+		color: rgba(255, 255, 255, 0.3);
+	}
+
 	.preview:hover .preview-hint {
 		color: #888;
 	}
 
+	.dark .preview:hover .preview-hint {
+		color: rgba(255, 255, 255, 0.6);
+	}
+
+	/* ── Home bar ── */
 	.home-bar {
 		border-top: 1px solid #f0ece4;
 		padding: 0.75rem 2rem;
+	}
+
+	.dark .home-bar {
+		border-top-color: rgba(255, 255, 255, 0.1);
 	}
 
 	.home-btn {
@@ -124,7 +196,15 @@
 		letter-spacing: 0.01em;
 	}
 
+	.dark .home-btn {
+		color: rgba(255, 255, 255, 0.35);
+	}
+
 	.home-btn:hover {
 		color: #1a1a1a;
+	}
+
+	.dark .home-btn:hover {
+		color: rgba(255, 255, 255, 0.88);
 	}
 </style>

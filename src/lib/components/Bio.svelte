@@ -25,6 +25,8 @@
   .bio {
     padding: 2.5rem;
     font-family: Montserrat, sans-serif;
+    max-width: 520px;
+    width: 100%;
   }
 
   .name {

@@ -19,19 +19,19 @@
 
 <Header />
 <Canvas {framePositions}>
-  <Frame id="about"     x={framePositions.about.x}     y={framePositions.about.y}     width={framePositions.about.width}     label="About">
+  <Frame id="about" fixed x={framePositions.about.x} y={framePositions.about.y} width={framePositions.about.width}>
     <Bio />
   </Frame>
-  <Frame id="portfolio" x={framePositions.portfolio.x} y={framePositions.portfolio.y} width={framePositions.portfolio.width} label="Work">
+  <Frame id="portfolio" x={framePositions.portfolio.x} y={framePositions.portfolio.y} width={framePositions.portfolio.width} label="Work" background="#f0ede8">
     <Portfolio works={data.works} />
   </Frame>
-  <Frame id="garden"    x={framePositions.garden.x}    y={framePositions.garden.y}    width={framePositions.garden.width}    label="Garden">
-    <div class="placeholder">
+  <Frame id="garden" x={framePositions.garden.x} y={framePositions.garden.y} width={framePositions.garden.width} label="Garden" background="#1a3a26" dark>
+    <div class="placeholder dark">
       <h2>Garden</h2>
       <p>Writing and notes — coming soon.</p>
     </div>
   </Frame>
-  <Frame id="links"     x={framePositions.links.x}     y={framePositions.links.y}     width={framePositions.links.width}     label="Links">
+  <Frame id="links" x={framePositions.links.x} y={framePositions.links.y} width={framePositions.links.width} label="Links">
     <div class="placeholder">
       <h2>Links</h2>
       <ul>
@@ -51,4 +51,8 @@
   .placeholder ul li { margin: 0.75rem 0; }
   .placeholder ul li a { font-size: 0.9rem; color: #555; text-decoration: none; border-bottom: 1px solid #e0dbd3; padding-bottom: 1px; transition: color 0.15s ease, border-color 0.15s ease; }
   .placeholder ul li a:hover { color: #1a1a1a; border-color: #1a1a1a; }
+
+  /* Dark theme overrides for garden */
+  .placeholder.dark h2 { color: rgba(220, 255, 220, 0.9); }
+  .placeholder.dark p { color: rgba(180, 220, 180, 0.6); }
 </style>
