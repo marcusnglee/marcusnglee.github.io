@@ -1,4 +1,4 @@
-export type GardenCategory = 'seed' | 'essay' | 'playlist' | 'library' | 'tea';
+export type GardenCategory = 'seed' | 'essay' | 'project' | 'library' | 'tea';
 
 export interface CategoryInfo {
 	label: string;
@@ -17,9 +17,9 @@ export const GARDEN_CATEGORIES: Record<GardenCategory, CategoryInfo> = {
 		description: 'Long-form writing on topics I care about',
 		color: 'crimson'
 	},
-	playlist: {
-		label: 'Playlists',
-		description: 'Curated collections of music and sounds',
+	project: {
+		label: 'Projects',
+		description: 'Things I am building or thinking through',
 		color: 'ochre'
 	},
 	library: {
@@ -35,11 +35,11 @@ export const GARDEN_CATEGORIES: Record<GardenCategory, CategoryInfo> = {
 };
 
 export interface NoteFrontmatter {
-	title: string;
-	published: boolean;
-	category: GardenCategory;
-	tags: string[];
-	created: string;
+	title?: string;
+	published: boolean | string;
+	category?: GardenCategory;
+	tags?: string[];
+	created?: string;
 	updated?: string;
 	description?: string;
 }
@@ -52,7 +52,8 @@ export interface BackLink {
 
 export interface ProcessedNote {
 	slug: string;
-	frontmatter: NoteFrontmatter;
+	frontmatter: Required<Pick<NoteFrontmatter, 'title' | 'category' | 'tags' | 'created'>> &
+		Pick<NoteFrontmatter, 'updated' | 'description' | 'published'>;
 	content: string;
 	rawContent: string;
 	readingTime: number;

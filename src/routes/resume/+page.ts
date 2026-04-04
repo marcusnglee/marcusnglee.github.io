@@ -3,6 +3,17 @@ import type { PageLoad } from './$types';
 
 const resumeItems: PortfolioItem[] = [
 	{
+		id: 'palantir	',
+		category: 'experience',
+		title: 'Palantir Technologies',
+		subtitle: 'Forward Deployed Engineer',
+		description: 'Incoming, commercial clients.',
+		link: 'https://www.palantir.com/',
+		tags: [],
+		featured: true,
+		year: 'August 2026'
+	},
+	{
 		id: 'arrowstreet',
 		category: 'experience',
 		title: 'Arrowstreet Capital',
@@ -10,7 +21,7 @@ const resumeItems: PortfolioItem[] = [
 		description: 'Built compute infrastructure for quantitative research.',
 		image: '/arrowstreet_logo.jpg',
 		link: 'https://www.arrowstreetcapital.com/',
-		tags: ['Quant Finance', 'HPC', 'Distributed Systems'],
+		tags: ['Quantitative Finance', 'HPC', 'Distributed Systems'],
 		featured: true,
 		year: 'Summer 2025'
 	},
@@ -38,16 +49,6 @@ const resumeItems: PortfolioItem[] = [
 		tags: ['Infrastructure as Code', 'DevOps', 'Kubernetes'],
 		year: 'Summer 2023'
 	},
-	{
-		id: 'williams',
-		category: 'education',
-		title: 'Williams College',
-		subtitle: 'BA Computer Science',
-		description:
-			'Pursuing a liberal arts education with a focus on CS, distributed systems, and design.',
-		tags: ['Computer Science', 'Liberal Arts'],
-		year: '2022–2026'
-	}
 ];
 
 export const load: PageLoad = () => ({ items: resumeItems });

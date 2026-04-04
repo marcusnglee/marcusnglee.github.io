@@ -9,7 +9,7 @@
 	const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 	async function goToSlide(n: number) {
-		if (n < 0 || n > 1 || n === displayedSlide || animState !== 'idle') return;
+		if (n < 0 || n > 2 || n === displayedSlide || animState !== 'idle') return;
 
 		animState = 'exiting';
 		await sleep(340);
@@ -25,7 +25,7 @@
 
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
-		goToSlide(e.deltaY > 0 ? 1 : 0);
+		goToSlide(e.deltaY > 0 ? displayedSlide + 1 : displayedSlide - 1);
 	}
 
 	function handleTouchStart(e: TouchEvent) {
@@ -34,8 +34,8 @@
 
 	function handleTouchEnd(e: TouchEvent) {
 		const diff = touchStartY - e.changedTouches[0].clientY;
-		if (diff > 30) goToSlide(1);
-		else if (diff < -30) goToSlide(0);
+		if (diff > 30) goToSlide(displayedSlide + 1);
+		else if (diff < -30) goToSlide(displayedSlide - 1);
 	}
 
 	onMount(() => {
@@ -50,7 +50,7 @@
 	<title>Marcus Lee</title>
 	<meta
 		name="description"
-		content="Marcus Lee is a software engineer exploring distributed systems, cloud infrastructure, and thoughtful design."
+		content="Marcus Lee's personal website"
 	/>
 </svelte:head>
 
@@ -66,33 +66,28 @@
 		<div class="slide" class:exiting={animState === 'exiting'} class:entering={animState === 'entering'}>
 			{#if displayedSlide === 0}
 				<Bio />
+			{:else if displayedSlide === 1}
+				<p class="slide-label">Currently, I'm thinking about</p>
+				<ul class="slide-list">
+					<li>Privacy-preserving ML systems, Federated Learning</li>
+					<li>Streaming Platform's Impact on Music Culture</li>
+					<li>Internet Dark Forest</li>
+				</ul>
 			{:else}
-				<p class="slide-text">
-					Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis
-					egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante.
-					Donec eu libero sit amet quam egestas semper.
-				</p>
-				<p class="slide-text">
-					Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et
-					sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae,
-					ornare sit amet, wisi.
-				</p>
+				<p class="slide-label">I always hold curiosity for</p>
+				<ul class="slide-list">
+					<li>music</li>
+					<li>功夫茶 (tea!)</li>
+					<li>digital gardens! (other peoples' opinions)</li>
+					<li>design (yes, this is intentionally vague c:)</li>
+				</ul>
 			{/if}
 		</div>
 
 		<div class="dots">
-			<button
-				class="dot"
-				class:active={displayedSlide === 0}
-				onclick={() => goToSlide(0)}
-				aria-label="Slide 1"
-			></button>
-			<button
-				class="dot"
-				class:active={displayedSlide === 1}
-				onclick={() => goToSlide(1)}
-				aria-label="Slide 2"
-			></button>
+			<button class="dot" class:active={displayedSlide === 0} onclick={() => goToSlide(0)} aria-label="Slide 1"></button>
+			<button class="dot" class:active={displayedSlide === 1} onclick={() => goToSlide(1)} aria-label="Slide 2"></button>
+			<button class="dot" class:active={displayedSlide === 2} onclick={() => goToSlide(2)} aria-label="Slide 3"></button>
 		</div>
 
 		<nav class="circle-nav">
@@ -116,8 +111,8 @@
 
 	.hero-circle {
 		position: absolute;
-		width: min(700px, 80vmin);
-		height: min(700px, 80vmin);
+		width: min(860px, 94vmin);
+		height: min(860px, 94vmin);
 		background-color: #f5f0e8;
 		border-radius: 50%;
 		top: 50%;
@@ -170,13 +165,37 @@
 		to   { opacity: 1; transform: translateY(0); }
 	}
 
-	/* --- second slide text --- */
+	/* --- second/third slide --- */
 
-	.slide-text {
+	.slide-label {
+		font-size: var(--text-sm);
+		color: var(--color-text-tertiary);
+		letter-spacing: 0.04em;
+		margin-bottom: var(--space-4);
+	}
+
+	.slide-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+	}
+
+	.slide-list li {
 		font-size: var(--text-lg);
 		color: var(--color-text-secondary);
 		line-height: var(--leading-relaxed);
-		margin-bottom: var(--space-4);
+		padding-left: var(--space-4);
+		position: relative;
+	}
+
+	.slide-list li::before {
+		content: '·';
+		position: absolute;
+		left: 0;
+		color: var(--color-text-tertiary);
 	}
 
 	/* --- dot indicator --- */

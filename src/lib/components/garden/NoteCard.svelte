@@ -14,9 +14,6 @@
 	};
 
 	function getHref(note: NoteMetadata): string {
-		if (note.category === 'tea') {
-			return `/tea/${note.slug}`;
-		}
 		return `/garden/${note.slug}`;
 	}
 

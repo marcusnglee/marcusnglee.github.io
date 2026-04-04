@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
-import { marked } from 'marked';
-import type { NoteFrontmatter, ProcessedNote, NoteMetadata } from '$lib/types/garden';
+import type { NoteFrontmatter, ProcessedNote, NoteMetadata, GardenCategory } from '$lib/types/garden';
+import { GARDEN_CATEGORIES } from '$lib/types/garden';
 import {
 	extractWikilinks,
 	transformWikilinks,
@@ -12,14 +12,37 @@ import {
 } from '$lib/utils/wikilinks';
 import { processObsidianSyntax } from '$lib/utils/obsidian-syntax';
 
-const CONTENT_DIR = path.join(process.cwd(), 'content', 'garden');
+const CONTENT_DIR = path.join(process.cwd(), 'garden');
 
 // Cache for processed notes
 let notesCache: ProcessedNote[] | null = null;
 let noteMapCache: Map<string, { category: string; slug: string }> | null = null;
 
 /**
- * Recursively finds all markdown files in a directory
+ * Infers a category from the folder path relative to CONTENT_DIR.
+ * Falls back to 'seed' if the folder name doesn't match a known category.
+ */
+function inferCategory(filePath: string): GardenCategory {
+	const relative = path.relative(CONTENT_DIR, filePath);
+	const parts = relative.split(path.sep);
+	if (parts.length > 1) {
+		const folder = parts[0].toLowerCase();
+		if (folder in GARDEN_CATEGORIES) {
+			return folder as GardenCategory;
+		}
+	}
+	return 'seed';
+}
+
+/**
+ * Infers a title from the filename (strips .md, preserves original casing).
+ */
+function inferTitle(filePath: string): string {
+	return path.basename(filePath, '.md');
+}
+
+/**
+ * Recursively finds all markdown files in a directory.
  */
 function findMarkdownFiles(dir: string): string[] {
 	const files: string[] = [];
@@ -35,7 +58,6 @@ function findMarkdownFiles(dir: string): string[] {
 			const fullPath = path.join(dir, entry.name);
 
 			if (entry.isDirectory()) {
-				// Skip hidden directories and common exclusions
 				if (!entry.name.startsWith('.') && entry.name !== 'node_modules') {
 					files.push(...findMarkdownFiles(fullPath));
 				}
@@ -51,14 +73,12 @@ function findMarkdownFiles(dir: string): string[] {
 }
 
 /**
- * Parses a single markdown note
+ * Parses a single markdown note, inferring missing frontmatter fields.
  */
 function parseNote(filePath: string): ProcessedNote | null {
 	try {
 		const fileContent = fs.readFileSync(filePath, 'utf-8');
 		const { data, content } = matter(fileContent);
-
-		// Validate frontmatter
 		const frontmatter = data as NoteFrontmatter;
 
 		// Only process published notes
@@ -66,34 +86,41 @@ function parseNote(filePath: string): ProcessedNote | null {
 			return null;
 		}
 
-		// Ensure required fields
-		if (!frontmatter.title || !frontmatter.category) {
-			console.warn(`Note missing required frontmatter: ${filePath}`);
-			return null;
+		// Infer missing fields
+		const title = frontmatter.title || inferTitle(filePath);
+		const category = frontmatter.category || inferCategory(filePath);
+		const tags = frontmatter.tags || [];
+
+		// Use frontmatter date, or fall back to file mtime
+		let created = frontmatter.created;
+		if (!created) {
+			const stat = fs.statSync(filePath);
+			created = stat.mtime.toISOString().split('T')[0];
 		}
 
-		// Generate slug from filename
-		const filename = path.basename(filePath);
-		const slug = generateSlug(filename);
+		const slug = generateSlug(path.basename(filePath));
 
-		// Process Obsidian syntax
-		let processedContent = processObsidianSyntax(content);
-
-		// Extract wikilinks before transformation
+		const processedContent = processObsidianSyntax(content);
 		const outgoingLinks = extractWikilinks(content);
-
-		// Calculate reading time
 		const stats = readingTime(content);
 		const wordCount = content.split(/\s+/).length;
 
 		return {
 			slug,
-			frontmatter,
+			frontmatter: {
+				published: frontmatter.published,
+				description: frontmatter.description,
+				updated: frontmatter.updated,
+				title,
+				category,
+				tags,
+				created: created as string
+			},
 			content: processedContent,
 			rawContent: content,
 			readingTime: Math.ceil(stats.minutes),
 			wordCount,
-			backlinks: [], // Will be filled later
+			backlinks: [],
 			outgoingLinks
 		};
 	} catch (error) {
@@ -103,13 +130,12 @@ function parseNote(filePath: string): ProcessedNote | null {
 }
 
 /**
- * Builds a map of note titles/slugs to their metadata
+ * Builds a map of note titles/slugs to their metadata.
  */
 function buildNoteMap(notes: ProcessedNote[]): Map<string, { category: string; slug: string }> {
 	const map = new Map<string, { category: string; slug: string }>();
 
 	notes.forEach((note) => {
-		// Map both title and slug
 		map.set(note.frontmatter.title, {
 			category: note.frontmatter.category,
 			slug: note.slug
@@ -124,32 +150,26 @@ function buildNoteMap(notes: ProcessedNote[]): Map<string, { category: string; s
 }
 
 /**
- * Loads and processes all notes
+ * Loads and processes all published notes.
  */
 export function loadAllNotes(): ProcessedNote[] {
-	// Return cached notes if available
 	if (notesCache) {
 		return notesCache;
 	}
 
-	// Find all markdown files
 	const files = findMarkdownFiles(CONTENT_DIR);
 
-	// Parse all notes
 	const notes = files
 		.map((file) => parseNote(file))
 		.filter((note): note is ProcessedNote => note !== null);
 
-	// Build note map for wikilink transformation
 	const noteMap = buildNoteMap(notes);
 	noteMapCache = noteMap;
 
-	// Transform wikilinks in all notes
 	notes.forEach((note) => {
 		note.content = transformWikilinks(note.content, noteMap);
 	});
 
-	// Build backlink graph
 	const backlinkMap = buildBacklinkGraph(
 		notes.map((n) => ({
 			slug: n.slug,
@@ -158,44 +178,30 @@ export function loadAllNotes(): ProcessedNote[] {
 		}))
 	);
 
-	// Add backlinks to notes
 	notes.forEach((note) => {
 		note.backlinks = backlinkMap.get(note.slug) || [];
 	});
 
-	// Cache the processed notes
 	notesCache = notes;
 
 	return notes;
 }
 
-/**
- * Gets a single note by slug
- */
 export function getNoteBySlug(slug: string): ProcessedNote | null {
 	const notes = loadAllNotes();
 	return notes.find((note) => note.slug === slug) || null;
 }
 
-/**
- * Gets notes by category
- */
 export function getNotesByCategory(category: string): ProcessedNote[] {
 	const notes = loadAllNotes();
 	return notes.filter((note) => note.frontmatter.category === category);
 }
 
-/**
- * Gets notes by tag
- */
 export function getNotesByTag(tag: string): ProcessedNote[] {
 	const notes = loadAllNotes();
 	return notes.filter((note) => note.frontmatter.tags.includes(tag));
 }
 
-/**
- * Gets all unique tags
- */
 export function getAllTags(): string[] {
 	const notes = loadAllNotes();
 	const tags = new Set<string>();
@@ -207,9 +213,6 @@ export function getAllTags(): string[] {
 	return Array.from(tags).sort();
 }
 
-/**
- * Gets note metadata (for listing pages)
- */
 export function getNotesMetadata(): NoteMetadata[] {
 	const notes = loadAllNotes();
 
@@ -225,9 +228,6 @@ export function getNotesMetadata(): NoteMetadata[] {
 	}));
 }
 
-/**
- * Clears the cache (useful for development)
- */
 export function clearCache() {
 	notesCache = null;
 	noteMapCache = null;

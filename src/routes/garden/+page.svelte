@@ -9,7 +9,7 @@
 	let { data }: { data: PageData } = $props();
 
 	// Get category from URL query param
-	const selectedCategory = $derived<GardenCategory | 'all'>(() => {
+	const selectedCategory = $derived.by<GardenCategory | 'all'>(() => {
 		const param = $page.url.searchParams.get('category');
 		if (param && param in GARDEN_CATEGORIES) {
 			return param as GardenCategory;
@@ -18,9 +18,9 @@
 	});
 
 	const filteredNotes = $derived(
-		selectedCategory() === 'all'
+		selectedCategory === 'all'
 			? data.notes
-			: data.notes.filter((n) => n.category === selectedCategory())
+			: data.notes.filter((n) => n.category === selectedCategory)
 	);
 
 	const categories = Object.entries(GARDEN_CATEGORIES) as [GardenCategory, typeof GARDEN_CATEGORIES[GardenCategory]][];
@@ -55,11 +55,13 @@
 	/>
 </svelte:head>
 
+<a href="/" class="back-link">home</a>
+
 <Container size="lg">
 	<div class="page-header">
-		<h1 class="title">Garden</h1>
+		<h1 class="title">Marcus' Garden</h1>
 		<p class="description">
-			A collection of ideas in various stages of growth. Some are seedlings, others more fully formed.
+			Welcome to my garden! Here, you will find a collection of my thoughts in various stages of growth. I'll be rolling out a way for others to contribute soon. I hope you enjoy your visit!
 		</p>
 	</div>
 
@@ -68,7 +70,7 @@
 		<div class="filter-pills">
 			<button
 				class="filter-pill"
-				class:active={selectedCategory() === 'all'}
+				class:active={selectedCategory === 'all'}
 				onclick={() => selectCategory('all')}
 			>
 				All
@@ -76,7 +78,7 @@
 			{#each categories as [key, info]}
 				<button
 					class="filter-pill"
-					class:active={selectedCategory() === key}
+					class:active={selectedCategory === key}
 					onclick={() => selectCategory(key)}
 				>
 					{info.label}
@@ -127,6 +129,22 @@
 </Container>
 
 <style>
+	.back-link {
+		position: fixed;
+		left: var(--space-8);
+		top: var(--space-8);
+		z-index: 10;
+		font-size: var(--text-base);
+		color: rgba(245, 240, 232, 0.55);
+		text-decoration: none;
+		letter-spacing: 0.04em;
+		transition: color 0.2s;
+	}
+
+	.back-link:hover {
+		color: rgba(245, 240, 232, 0.9);
+	}
+
 	.page-header {
 		text-align: center;
 		max-width: var(--container-md);

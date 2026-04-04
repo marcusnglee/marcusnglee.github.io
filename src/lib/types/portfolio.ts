@@ -6,7 +6,7 @@ export interface PortfolioItem {
 	description: string;
 	image?: string;
 	link?: string;
-	tags: string[];
+	tags?: string[];
 	featured?: boolean;
 	year?: string;
 }
