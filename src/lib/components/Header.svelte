@@ -14,7 +14,6 @@
 </script>
 
 <header>
-	<div class="name">marcus lee</div>
 	<nav>
 		{#each navItems as item}
 			<button onclick={() => navigate(item.id)} aria-label={item.id}>

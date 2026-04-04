@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { navigateFn, locked, activeSection } from '$lib/stores/canvas';
+	import { navigateFn, clearSectionFn, locked, activeSection } from '$lib/stores/canvas';
 	import type { Snippet } from 'svelte';
 
 	interface FramePos {
@@ -30,7 +30,6 @@
 	let lastMouseY = 0;
 
 	function startDrag(e: MouseEvent) {
-		if ($locked) return;
 		if (e.button !== 0) return;
 		const target = e.target as HTMLElement;
 		if (target.closest('button, a, input, textarea, select')) return;
@@ -53,14 +52,11 @@
 
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
-		if ($locked) return;
-		// Pan only — zoom is programmatic via navigateTo
 		tx -= e.deltaX;
 		ty -= e.deltaY;
 	}
 
 	function handleTouchStart(e: TouchEvent) {
-		if ($locked) return;
 		if (e.touches.length === 1) {
 			const target = e.touches[0].target as HTMLElement;
 			if (target.closest('button, a, input, textarea, select')) return;
@@ -72,7 +68,6 @@
 
 	function handleTouchMove(e: TouchEvent) {
 		e.preventDefault();
-		if ($locked) return;
 		if (e.touches.length === 1 && isDragging) {
 			tx += e.touches[0].clientX - lastMouseX;
 			ty += e.touches[0].clientY - lastMouseY;
@@ -92,18 +87,29 @@
 		const vh = window.innerHeight;
 		isAnimating = true;
 
-		// Zoom to fill viewport for sections; reset to 1 for about
-		const newScale =
-			id === 'about' ? 1 : Math.min(vw / frame.width, vh / frame.height);
-		tx = vw / 2 - (frame.x + frame.width / 2) * newScale;
-		ty = vh / 2 - (frame.y + frame.height / 2) * newScale;
-		scale = newScale;
+		// Always navigate at scale 1 — sections open as fullscreen overlays
+		tx = vw / 2 - (frame.x + frame.width / 2);
+		ty = vh / 2 - (frame.y + frame.height / 2);
+		scale = 1;
 
-		locked.set(id !== 'about');
+		locked.set(false);
 		activeSection.set(id === 'about' ? null : id);
 		setTimeout(() => {
 			isAnimating = false;
 		}, 560);
+	}
+
+	function clearSection(id: string) {
+		const frame = framePositions[id];
+		if (!frame) return;
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+
+		// Position canvas so the frame button is centered, then close overlay
+		tx = vw / 2 - (frame.x + frame.width / 2);
+		ty = vh / 2 - (frame.y + frame.height / 2);
+		scale = 1;
+		activeSection.set(null);
 	}
 
 	onMount(() => {
@@ -116,22 +122,24 @@
 		}
 
 		navigateFn.set(navigateTo);
+		clearSectionFn.set(clearSection);
 
 		window.addEventListener('mousemove', onGlobalMouseMove);
 		window.addEventListener('mouseup', onGlobalMouseUp);
+		window.addEventListener('wheel', handleWheel, { passive: false });
 
-		viewportEl.addEventListener('wheel', handleWheel, { passive: false });
 		viewportEl.addEventListener('touchstart', handleTouchStart, { passive: false });
 		viewportEl.addEventListener('touchmove', handleTouchMove, { passive: false });
 		viewportEl.addEventListener('touchend', handleTouchEnd);
 
 		return () => {
 			navigateFn.set(null);
+			clearSectionFn.set(null);
 			locked.set(false);
 			activeSection.set(null);
 			window.removeEventListener('mousemove', onGlobalMouseMove);
 			window.removeEventListener('mouseup', onGlobalMouseUp);
-			viewportEl.removeEventListener('wheel', handleWheel);
+			window.removeEventListener('wheel', handleWheel);
 			viewportEl.removeEventListener('touchstart', handleTouchStart);
 			viewportEl.removeEventListener('touchmove', handleTouchMove);
 			viewportEl.removeEventListener('touchend', handleTouchEnd);
@@ -162,7 +170,9 @@
 		position: fixed;
 		inset: 0;
 		overflow: hidden;
-		background-color: #f8f6f1;
+		background-color: #f5f0e8;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg transform='translate(40,40)'%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(0) translate(0,-6)'/%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(60) translate(0,-6)'/%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(120) translate(0,-6)'/%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(180) translate(0,-6)'/%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(240) translate(0,-6)'/%3E%3Cellipse rx='3.5' ry='10' fill='%23c4aa80' opacity='0.22' transform='rotate(300) translate(0,-6)'/%3E%3Ccircle r='4' fill='%23b89060' opacity='0.28'/%3E%3C/g%3E%3Cg transform='translate(0,0)'%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(0) translate(0,-3)'/%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(60) translate(0,-3)'/%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(120) translate(0,-3)'/%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(180) translate(0,-3)'/%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(240) translate(0,-3)'/%3E%3Cellipse rx='2' ry='5.5' fill='%23c4aa80' opacity='0.14' transform='rotate(300) translate(0,-3)'/%3E%3Ccircle r='2.5' fill='%23b89060' opacity='0.18'/%3E%3C/g%3E%3C/svg%3E");
+		background-size: 80px 80px;
 		user-select: none;
 		-webkit-user-select: none;
 		outline: none;

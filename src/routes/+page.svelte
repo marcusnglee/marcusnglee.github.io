@@ -1,22 +1,30 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import Canvas from '$lib/components/Canvas.svelte';
   import Frame from '$lib/components/Frame.svelte';
   import Header from '$lib/components/Header.svelte';
   import Bio from '$lib/components/Bio.svelte';
   import Portfolio from '$lib/components/Portfolio.svelte';
-  import { locked, activeSection, navigateFn } from '$lib/stores/canvas';
+  import { activeSection, clearSectionFn } from '$lib/stores/canvas';
   import type { PageProps } from './$types';
 
   let { data }: PageProps = $props();
 
-  // height is an estimate used only for centering on navigate
-  const framePositions = {
-    about:     { x: -300, y: -200, width: 600, height: 400 },
-    portfolio: { x: 1100, y: -250, width: 740, height: 650 },
-    garden:    { x: -300, y:  350, width: 600, height: 400 },
-    links:     { x: -1700, y: -200, width: 480, height: 380 },
-  };
+  // Real screen dimensions — set on mount so adjacent frames touch bio edges
+  let ww = $state(1440);
+  let wh = $state(900);
+  onMount(() => { ww = window.innerWidth; wh = window.innerHeight; });
+
+  // Bio is 100vw×100vh via CSS, centered on canvas origin (0,0).
+  // Canvas centers so that origin = screen center → tx = vw/2, ty = vh/2.
+  // In canvas space: bio left = -ww/2, right = ww/2, top = -wh/2, bottom = wh/2.
+  const framePositions = $derived({
+    about:     { x: 0,                   y: 0,              width: 0,   height: 0   },
+    portfolio: { x: -ww / 2,             y: wh / 2 - 1,     width: ww,  height: wh  },
+    garden:    { x: ww / 2 - 1,          y: -wh / 2,        width: ww,  height: wh  },
+    links:     { x: -(ww / 2 + 619),     y: -wh / 2,        width: 620, height: 340 },
+  });
 
   // Convert vertical wheel to horizontal scroll on section panels
   function hscroll(node: HTMLElement) {
@@ -31,20 +39,14 @@
 
 <Header />
 
-<!-- ── About overlay ─────────────────────────────────────────── -->
-<!-- Rendered outside canvas so position:fixed isn't inside a transform context -->
-<div class="about-overlay" class:hiding={$locked}>
-  <Bio />
-</div>
-
 <!-- ── Section overlays ──────────────────────────────────────── -->
 
 {#if $activeSection === 'portfolio'}
-  <div class="section-overlay" style="background: #f0ede8;" transition:fade={{ duration: 280, delay: 60 }}>
+  <div class="section-overlay" style="background: #ffffff;" transition:fade={{ duration: 280, delay: 60 }}>
     <div class="section-scroll" use:hscroll>
       <Portfolio works={data.works} />
     </div>
-    <button class="home-btn" onclick={() => $navigateFn?.('about')}>← Home</button>
+    <button class="home-btn" onclick={() => $clearSectionFn?.('portfolio')}>←</button>
   </div>
 {/if}
 
@@ -56,7 +58,7 @@
         <p>Writing and notes — coming soon.</p>
       </div>
     </div>
-    <button class="home-btn dark" onclick={() => $navigateFn?.('about')}>← Home</button>
+    <button class="home-btn dark" onclick={() => $clearSectionFn?.('garden')}>←</button>
   </div>
 {/if}
 
@@ -72,34 +74,74 @@
         </ul>
       </div>
     </div>
-    <button class="home-btn" onclick={() => $navigateFn?.('about')}>← Home</button>
+    <button class="home-btn" onclick={() => $clearSectionFn?.('links')}>←</button>
   </div>
 {/if}
 
-<!-- ── Canvas: zoom animation + preview cards only ───────────── -->
+<!-- ── Canvas ─────────────────────────────────────────────────── -->
 <Canvas {framePositions}>
-  <Frame id="portfolio" x={framePositions.portfolio.x} y={framePositions.portfolio.y} width={framePositions.portfolio.width} label="Work"   background="#f0ede8" />
-  <Frame id="garden"    x={framePositions.garden.x}    y={framePositions.garden.y}    width={framePositions.garden.width}    label="Garden" background="#1a3a26" dark />
-  <Frame id="links"     x={framePositions.links.x}     y={framePositions.links.y}     width={framePositions.links.width}     label="Links" />
+  <!-- Bio centered on canvas origin, fills the viewport exactly -->
+  <div class="bio-node">
+    <Bio />
+    <span class="bio-arrow bio-arrow--right">Garden →</span>
+    <span class="bio-arrow bio-arrow--down">↓ Work</span>
+    <span class="bio-arrow bio-arrow--left">← Links</span>
+  </div>
+
+  <Frame id="portfolio" x={framePositions.portfolio.x} y={framePositions.portfolio.y} width={framePositions.portfolio.width} height={framePositions.portfolio.height} label="Work"   description="Projects in distributed systems, cloud infra, and frontend."  background="#ffffff" />
+  <Frame id="garden"    x={framePositions.garden.x}    y={framePositions.garden.y}    width={framePositions.garden.width}    height={framePositions.garden.height}    label="Garden" description="Writing, notes, and things I'm thinking through."             background="#1a3a26" dark />
+  <Frame id="links"     x={framePositions.links.x}     y={framePositions.links.y}     width={framePositions.links.width}     height={framePositions.links.height}     label="Links"  description="Where to find me online." />
 </Canvas>
 
 <style>
-  /* ── About overlay ── */
-  .about-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
+  /* ── Bio canvas node — fills the viewport, centered on canvas origin ── */
+  .bio-node {
+    position: absolute;
+    left: -50vw;
+    top: -50vh;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f8f6f1;
-    opacity: 1;
-    pointer-events: none; /* pass drags through to canvas */
-    transition: opacity 0.35s ease;
+    background: #f5f0e8;
   }
 
-  .about-overlay.hiding {
-    opacity: 0;
+  /* ── Bio directional arrows ── */
+  .bio-arrow {
+    position: absolute;
+    font-family: Montserrat, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #bbb;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .bio-arrow--right {
+    right: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.1em;
+  }
+
+  .bio-arrow--down {
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .bio-arrow--left {
+    left: 1.75rem;
+    top: 50%;
+    transform: translateY(-50%) rotate(180deg);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 0.1em;
   }
 
   /* ── Section overlays ── */
