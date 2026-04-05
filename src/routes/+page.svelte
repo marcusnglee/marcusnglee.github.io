@@ -4,13 +4,15 @@
 
 	let displayedSlide = $state(0);
 	let animState = $state<'idle' | 'exiting' | 'entering'>('idle');
+	let locked = false;
 	let touchStartY = 0;
 
 	const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 	async function goToSlide(n: number) {
-		if (n < 0 || n > 2 || n === displayedSlide || animState !== 'idle') return;
+		if (n < 0 || n > 2 || n === displayedSlide || locked) return;
 
+		locked = true;
 		animState = 'exiting';
 		await sleep(340);
 
@@ -21,10 +23,13 @@
 		await sleep(560);
 
 		animState = 'idle';
+		await sleep(300);
+		locked = false;
 	}
 
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
+		if (locked) return;
 		goToSlide(e.deltaY > 0 ? displayedSlide + 1 : displayedSlide - 1);
 	}
 
@@ -70,8 +75,9 @@
 				<p class="slide-label">Currently, I'm thinking about</p>
 				<ul class="slide-list">
 					<li>Privacy-preserving ML systems, Federated Learning</li>
-					<li>Streaming Platform's Impact on Music Culture</li>
-					<li>Internet Dark Forest</li>
+					<li>Streaming Platforms' Impact on Music Culture</li>
+					<li>Dark Forest Theory of the Internet</li>
+					<li>Knowledge Bases!</li>
 				</ul>
 			{:else}
 				<p class="slide-label">I always hold curiosity for</p>
@@ -83,6 +89,10 @@
 				</ul>
 			{/if}
 		</div>
+
+		{#if displayedSlide === 0}
+			<span class="scroll-hint" aria-hidden="true">scroll for more</span>
+		{/if}
 
 		<div class="dots">
 			<button class="dot" class:active={displayedSlide === 0} onclick={() => goToSlide(0)} aria-label="Slide 1"></button>
@@ -128,7 +138,7 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		height: min(380px, 52vmin);
+		height: min(380px, 60vh);
 
 		--color-text-primary: #1a3316;
 		--color-text-secondary: rgba(26, 51, 22, 0.75);
@@ -208,17 +218,30 @@
 	}
 
 	.dot {
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: transparent;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		position: relative;
+	}
+
+	.dot::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		width: 6px;
 		height: 6px;
 		border-radius: 50%;
 		background: rgba(26, 51, 22, 0.2);
-		border: none;
-		padding: 0;
-		cursor: pointer;
 		transition: background 0.3s;
 	}
 
-	.dot.active {
+	.dot.active::after {
 		background: #1a3316;
 	}
 
@@ -249,9 +272,47 @@
 		color: rgba(26, 51, 22, 0.25);
 	}
 
+	/* --- scroll hint --- */
+
+	.scroll-hint {
+		display: block;
+		text-align: center;
+		font-size: var(--text-xs);
+		color: var(--color-text-tertiary);
+		letter-spacing: 0.06em;
+		margin-top: var(--space-6);
+		animation: hintFade 4s ease-in-out forwards;
+		pointer-events: none;
+	}
+
+	@keyframes hintFade {
+		0%, 60% { opacity: 1; }
+		100%    { opacity: 0; }
+	}
+
 	@media (max-width: 600px) {
 		.hero {
-			padding: var(--space-6);
+			padding: var(--space-4);
+		}
+
+		.hero-circle {
+			width: calc(100% - var(--space-8));
+			height: calc(100% - var(--space-8));
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			border-radius: 0;
+		}
+
+		.hero-content {
+			max-width: 100%;
+			height: auto;
+			min-height: auto;
+			padding: 0 var(--space-6);
+		}
+
+		.slide-list li {
+			font-size: var(--text-base);
 		}
 	}
 </style>

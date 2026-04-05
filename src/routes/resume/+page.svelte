@@ -44,7 +44,7 @@
 		position: fixed;
 		width: min(860px, 94vmin);
 		height: min(860px, 94vmin);
-		background-color: #1d4a45;
+		background-color: #122e2b;
 		border-radius: 50%;
 		top: 50%;
 		left: 50%;
@@ -68,6 +68,25 @@
 
 	.back-link:hover {
 		color: rgba(253, 244, 236, 0.85);
+	}
+
+	@media (max-width: 640px) {
+		.back-link {
+			position: relative;
+			left: auto;
+			top: auto;
+			display: block;
+			padding: var(--space-4) var(--space-4) 0;
+			z-index: 10;
+		}
+
+		.hero-section {
+			height: calc(100dvh - 3rem);
+		}
+
+		.timeline-section {
+			padding-bottom: var(--space-16);
+		}
 	}
 
 	.page {

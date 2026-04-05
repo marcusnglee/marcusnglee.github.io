@@ -151,6 +151,20 @@
 		margin: var(--space-16) auto var(--space-8);
 	}
 
+	@media (max-width: 640px) {
+		.back-link {
+			position: relative;
+			left: auto;
+			top: auto;
+			display: block;
+			padding: var(--space-4) var(--space-4) 0;
+		}
+
+		.page-header {
+			margin-top: var(--space-6);
+		}
+	}
+
 	.title {
 		font-family: var(--font-serif);
 		font-size: var(--text-3xl);
