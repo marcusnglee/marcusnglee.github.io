@@ -12,7 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
-		"sync-garden": "git submodule update --remote --merge || echo 'No submodule yet'"
+		"sync-garden": "git submodule init && git submodule update --remote --merge || echo 'Submodule sync failed'"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
