@@ -1,2 +1,24 @@
+# build output
 .svelte-kit
+build
+dist
+.vercel
+
+# dependencies
 node_modules
+
+# env files
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode
+.idea
+
+# claude
+.claude

@@ -1,0 +1,28 @@
+/* Medium sage + warm cream color palette */
+:root {
+	/* Background colors */
+	--color-bg-primary: #f5f0e8;
+	--color-bg-secondary: #ede8de;
+	--color-bg-tertiary: #e0d9cc;
+
+	/* Text colors */
+	--color-text-primary: #1a3316;
+	--color-text-secondary: #3d5c38;
+	--color-text-tertiary: #617a5d;
+
+	/* Accent colors */
+	--color-accent-crimson: #d45c2b;
+	--color-accent-ochre: #c69c6d;
+	--color-accent-sage: #8a9a7e;
+
+	/* Functional colors */
+	--color-link: #d45c2b;
+	--color-link-hover: #b84820;
+	--color-border: #c8c0b4;
+	--color-border-light: #ddd8ce;
+
+	/* Semantic colors */
+	--color-success: var(--color-accent-sage);
+	--color-warning: var(--color-accent-ochre);
+	--color-error: var(--color-accent-crimson);
+}

@@ -1,0 +1,51 @@
+/* Global Styles */
+body {
+	background-color: #4a6741;
+	overflow-x: hidden;
+}
+
+::selection {
+	background-color: #d45c2b;
+	color: #f5f0e8;
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+	outline: 2px solid #d45c2b;
+	outline-offset: 2px;
+}
+
+/* Utility classes */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.container {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--space-4);
+	padding-right: var(--space-4);
+}
+
+@media (min-width: 640px) {
+	.container {
+		padding-left: var(--space-6);
+		padding-right: var(--space-6);
+	}
+}
+
+@media (min-width: 1024px) {
+	.container {
+		padding-left: var(--space-8);
+		padding-right: var(--space-8);
+	}
+}
